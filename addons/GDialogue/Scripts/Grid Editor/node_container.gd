@@ -12,6 +12,7 @@ func _ready() -> void:
 	_connect_signals()	
 	_set_to_default_parameters()
 	_construct_node(NodeModuleTextEdit)
+	_construct_node(NodeModuleTextEdit, Vector2(300, 300))
 	return
 
 ## Connect and emit important signals.

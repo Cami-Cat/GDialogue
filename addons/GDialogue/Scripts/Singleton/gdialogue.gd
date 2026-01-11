@@ -126,15 +126,17 @@ signal grid_moved(relative_to : Vector2, current_zoom : float)
 signal grid_zoomed(relative_to : float)
 signal grid_tool_changed(tool_mode : GridEditor.TOOL_MODE)
 signal grid_node_hover_state_changed(node : Node, state : bool)
-signal grid_node_selected(overwrite : bool, node : Node)
-signal grid_nodes_selected(overwrite : bool, nodes : Array[Node])
 signal grid_area_created(in_area_rid : RID)
 signal set_node_parent(in_node : Control)
 
 ## - Selection
 
-signal node_selected(node : GridNode, additive : bool)
-signal nodes_selected(nodes : Array[GridNode], additive : bool)
+
+signal grid_node_selected(node : Node, overwrite : bool)
+signal grid_node_deselected(node : Node, overwrite : bool)
+signal move_selected_nodes(relative_position : Vector2)
+
+var selected_nodes : Array[Node]
 
 ## - History
 
@@ -161,6 +163,9 @@ func _connect_signals() -> void:
 	grid_area_created.connect(_add_area_to_space)
 	grid_zoomed.connect(_set_zoom)
 	grid_ready.connect(_set_grid)
+	grid_node_selected.connect(select_node)
+	grid_node_deselected.connect(deselect_node)
+	move_selected_nodes.connect(_move_selected_nodes)
 
 func _ready() -> void:
 	_create_physics_space()
@@ -209,3 +214,28 @@ func _create_physics_space() -> void:
 func _add_area_to_space(area_rid : RID) -> void:
 	PhysicsServer2D.area_set_space(area_rid, _physics_server)
 	return
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Node Selection
+## ────────────────────────────────────────────────────────────────────────────
+
+func select_node(in_node : Node, overwrite_selected_nodes : bool) -> void:
+	if overwrite_selected_nodes:
+		deselect_all_selected_nodes()
+	selected_nodes.append(in_node)
+	in_node._select_node()
+	return
+	
+func deselect_node(in_node : Node, override : bool) -> void:
+	selected_nodes.erase(in_node)
+	in_node._deselect_node()
+	return
+
+func deselect_all_selected_nodes() -> void:
+	for node in selected_nodes:
+		deselect_node(node, false)
+	return
+
+func _move_selected_nodes(relative_to : Vector2) -> void:
+	for node in selected_nodes:
+		node._move(relative_to)

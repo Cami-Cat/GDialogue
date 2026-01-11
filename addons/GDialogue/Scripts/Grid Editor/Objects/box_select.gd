@@ -23,8 +23,8 @@ var outline : Line2D
 var area : Area2D
 
 ## The colour of the selection box and outline.
-var draw_colour : Color = Color("e7f3f70e")
-var outline_colour : Color = Color("c2e1ea86")
+@onready var draw_colour : Color = GDialogue.editor_colours[GDialogue.COLOR_LIST.Box_Select_Rect]
+@onready var outline_colour : Color = GDialogue.editor_colours[GDialogue.COLOR_LIST.Box_Select_Outline]
 
 ## ────────────────────────────────────────────────────────────────────────────
 ## - Perform setup
@@ -185,33 +185,36 @@ func _highlight_selected_nodes() -> void:
 	for _collider in highlighted_nodes:
 		if !_colliders.has(_collider):
 			highlighted_nodes.erase(_collider)
-			_collider._unhighlight()
+			GDialogue.grid_node_deselected.emit(_collider, false)
 				
 	# Now we can check if there is anything within _colliders, if not, we can just return right away.
 	if _colliders.size() == 0 : return
 	
 	# We then check for all colliders, if there is a new collider within the array we highlight it.
 	for _collider in _colliders:
-		if _collider.is_in_group("grid_node") && _collider.has_method("_highlight"):
+		if _collider is GridNode:
 			if highlighted_nodes.has(_collider) : continue
 			highlighted_nodes.append(_collider)
-			_collider._highlight()
+			GDialogue.grid_node_selected.emit(_collider, false)
 	return
 
 ## On an object's hover state changed, this is called. This will handle the selection and deselection as a single central function.
 func _hover_state_changed(in_node : Node, state : bool) -> void:
-	if !in_node.is_in_group("grid_node") : return
+	if in_node is not GridNode  : return
 	if state : _select(in_node)
 	else	 : _deselect(in_node)
 	return
 
 ## Add it to the selection.
 func _select(in_area : Node) -> void:
-	if in_area.has_method("_highlight") : in_area._highlight()
+	if in_area is GridNode:
+		GDialogue.grid_node_selected.emit(in_area, false)
 	return
 
 ## Remove it from the selection.
 func _deselect(in_area : Node) -> void:
+	if in_area is GridNode:
+		GDialogue.grid_node_deselected.emit(in_area, false)
 	return
 
 ## Return all of the connected nodes.

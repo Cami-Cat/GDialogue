@@ -47,36 +47,33 @@ func _input(event : InputEvent) -> void:
 		# We don't want to be able to move if nothing is selected.
 		# Pan override control
 		if event.button_mask == MOUSE_BUTTON_MASK_MIDDLE:
-			if !has_focus : return
 			_move_grid(event)
 		# Pan tool control.
 		if current_grid_tool == GridEditor.TOOL_MODE.PAN:
 			if event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-				if !has_focus : return
 				_move_grid(event)
 	elif event is InputEventMouseButton:
 		# Scrolling
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			if !has_focus : return
 			_zoom(zoom_step)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			if !has_focus : return
 			_zoom(-zoom_step)
 		# Box Select override control
 		if event.button_index == MOUSE_BUTTON_RIGHT:
-			if !has_focus : return
 			if event.is_pressed():
 				_create_box_select()
 			if event.is_released():
 				_end_box_select()
 	## - MAIN CONTROLS:
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			if !has_focus : return
 			if current_grid_tool == GridEditor.TOOL_MODE.BOX_SELECT:
 				if event.is_pressed():
 					_create_box_select()
 				if event.is_released():
 					_end_box_select()
+	elif event is InputEventKey:
+		if event.keycode == KEY_N:
+			GDialogue._grid.node_parent._construct_node(NodeModuleTextEdit, get_global_mouse_position())
 	return
 
 ## ────────────────────────────────────────────────────────────────────────────
@@ -90,13 +87,12 @@ func _move_grid(initial_click_point : InputEvent) -> void:
 	return
 
 func _create_box_select() -> void:
-	if !has_focus : return
 	if box_select : return
 	box_select = BoxSelect.new()
+	add_child(box_select)
 	return
 
 func _end_box_select() -> void:
-	GDialogue.nodes_selected.emit(box_select.get_selected_nodes())
 	box_select.queue_free()
 	return
 

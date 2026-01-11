@@ -158,7 +158,10 @@ func _input(event: InputEvent) -> void:
 			# Select the node, if it's not selected. Otherwise, update the input position.
 			if event.is_pressed():
 				if !node_selected:
-					_select_node(event.position)
+					if Input.is_key_pressed(KEY_CTRL):
+						_input_select_node(event.position, false)
+					else:
+						_input_select_node(event.position, true)
 					return
 				else:
 					_update_input_position(event.position)
@@ -170,7 +173,10 @@ func _input(event: InputEvent) -> void:
 				if _is_just_selected() : return
 				# Check for movement.
 				if !has_moved(event.position):
-					_deselect()
+					if event.button_mask == KEY_MASK_CTRL:
+						_input_deselect_node(false)
+					else:
+						_input_deselect_node(true)
 					return
 					
 	if event is InputEventMouseMotion:
@@ -182,37 +188,35 @@ func _input(event: InputEvent) -> void:
 			# We update dragging here so we can avoid all those checks above and allow it to keep moving even when the mouse is outside of it's rect.
 			# And then move it to the relative position of the event. Multiplied by the zoom level of the grid.
 			is_dragging = true
-			_move(event.relative, GDialogue._grid_zoom_level)
+			GDialogue.move_selected_nodes.emit((event.relative / GDialogue._grid_zoom_level))
 
-func _select_node(in_position : Vector2) -> void:
+func _input_select_node(in_position : Vector2 = Vector2.ZERO, overwrite_selected_nodes : bool = true) -> void:
 	# We update just_selected so that when we check for release, we don't automatically deselect it.
 	just_selected = true
 	# We also then set node_selected so that the node is indeed selected.
-	node_selected = true
-	background._highlight()
+	GDialogue.grid_node_selected.emit(self, overwrite_selected_nodes)
 	# We then update the position of the input to where the input event happened.
 	_update_input_position(in_position)
 
+func _input_deselect_node(overwrite_selected_nodes : bool = true) -> void:
+	GDialogue.grid_node_deselected.emit(self, overwrite_selected_nodes)
+	return
+
 func _is_just_selected() -> bool :
-	# If it's just selected, return that it was indeed just selected, but then force update it to false so the next check immediately returns false.
+	# If it's just selected, return that it was indeed just selected, but then update it to false so the next check immediately returns false.
 	if just_selected:
 		just_selected = false
 		return true
 	return false
-
-func _deselect() -> void:
-	background._unhighlight()
-	node_selected = false
-	return
 
 func _update_input_position(in_position : Vector2) -> void:
 	# We set this for comparison against whether the mouse has moved from the initial position of the event. As seen in the function:
 	# has_moved() -> bool:
 	input_position = in_position
 	
-func _move(relative_to : Vector2, current_zoom : float) -> void:
+func _move(relative_position : Vector2) -> void:
 	# Update the position of the node relative to the zoom on the grid.
-	position += relative_to / current_zoom
+	position += relative_position
 	return
 
 func has_moved(in_position : Vector2) -> bool:
@@ -228,12 +232,12 @@ func has_moved(in_position : Vector2) -> bool:
 ## - Visuals
 ## ────────────────────────────────────────────────────────────────────────────
 
-func _highlight() -> void:
-	if node_selected : return
-	background.highlight()
+func _select_node() -> void:
+	background._highlight()
+	node_selected = true
 	return
 
-func _unhighlight() -> void:
-	if node_selected : return
-	background.unhighlight()
+func _deselect_node() -> void:
+	node_selected = false
+	background._unhighlight()
 	return
