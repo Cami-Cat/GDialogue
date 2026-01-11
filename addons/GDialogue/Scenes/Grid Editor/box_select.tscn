@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmmtmdf5a04kg"]
+
+[ext_resource type="Script" uid="uid://dv7hokguy1mou" path="res://addons/GDialogue/Scripts/Grid Editor/Objects/box_select.gd" id="1_q0lya"]
+
+[node name="Box Select" type="Control"]
+z_index = 4096
+clip_contents = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -524.42566
+offset_top = 582.56494
+offset_right = -1676.4257
+offset_bottom = -65.43506
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_q0lya")

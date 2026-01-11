@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://do4dium4ft1w6"]
+
+[ext_resource type="Script" uid="uid://dg3lr814uueu" path="res://addons/GDialogue/Scripts/Grid Editor/Objects/Node/node.gd" id="1_l2y0h"]
+
+[node name="Node" type="Area2D"]
+script = ExtResource("1_l2y0h")

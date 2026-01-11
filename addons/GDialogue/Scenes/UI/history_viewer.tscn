@@ -1,0 +1,58 @@
+[gd_scene load_steps=4 format=3 uid="uid://byv8xoq057qly"]
+
+[ext_resource type="Script" uid="uid://42bmd8kg4h43" path="res://addons/GDialogue/Scripts/UI/history_viewer.gd" id="1_uxh27"]
+[ext_resource type="Theme" uid="uid://pprke8bja035" path="res://addons/GDialogue/Assets/Themes/t_history_description.tres" id="2_b6ae6"]
+[ext_resource type="Theme" uid="uid://byv21ulvvdw1l" path="res://addons/GDialogue/Assets/Themes/t_background_rect.tres" id="2_t2lom"]
+
+[node name="History Viewer" type="Control"]
+z_index = 4096
+y_sort_enabled = true
+custom_minimum_size = Vector2(400, 200)
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -528.0
+offset_right = -128.0
+offset_bottom = 238.0
+grow_horizontal = 0
+mouse_filter = 2
+script = ExtResource("1_uxh27")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 0
+offset_right = 408.0
+offset_bottom = 300.0
+mouse_filter = 0
+
+[node name="Action Container" type="VBoxContainer" parent="ScrollContainer"]
+custom_minimum_size = Vector2(400, 50)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_t2lom")
+
+[node name="Empty Label" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -106.0
+offset_top = -16.0
+offset_right = 106.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_b6ae6")
+text = "It's empty in here..."

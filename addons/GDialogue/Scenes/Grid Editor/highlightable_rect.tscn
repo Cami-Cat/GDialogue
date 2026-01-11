@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://kukpht6mtvce"]
+
+[ext_resource type="Script" uid="uid://chhearjvip6py" path="res://addons/GDialogue/Scripts/Grid Editor/Objects/highlightable_rect.gd" id="1_hy0yl"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hy0yl"]
+bg_color = Color(0.010382443, 0.0045219315, 0.0009034661, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8980392, 0.5568628, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+expand_margin_left = 1.0
+expand_margin_top = 1.0
+expand_margin_right = 1.0
+expand_margin_bottom = 1.0
+
+[sub_resource type="Theme" id="Theme_cedvt"]
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_hy0yl")
+
+[node name="Outline Panel" type="PanelContainer"]
+z_index = 100
+y_sort_enabled = true
+custom_minimum_size = Vector2(400, 200)
+offset_right = 400.0
+offset_bottom = 200.0
+mouse_filter = 1
+theme = SubResource("Theme_cedvt")
+script = ExtResource("1_hy0yl")

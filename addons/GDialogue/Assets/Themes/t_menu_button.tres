@@ -1,0 +1,25 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dui8roy5tbvbm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1fikj"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[resource]
+Button/colors/font_pressed_color = Color(1, 0.45403802, 0.44661927, 1)
+Button/colors/icon_hover_color = Color(1, 0.45490196, 0.44705883, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 0.6235677, 0.6045986, 1)
+Button/colors/icon_pressed_color = Color(1, 0.45490196, 0.44705883, 1)
+Button/styles/disabled = SubResource("StyleBoxFlat_1fikj")
+Button/styles/disabled_mirrored = SubResource("StyleBoxFlat_1fikj")
+Button/styles/focus = SubResource("StyleBoxFlat_1fikj")
+Button/styles/hover = SubResource("StyleBoxFlat_1fikj")
+Button/styles/hover_mirrored = SubResource("StyleBoxFlat_1fikj")
+Button/styles/hover_pressed = SubResource("StyleBoxFlat_1fikj")
+Button/styles/hover_pressed_mirrored = SubResource("StyleBoxFlat_1fikj")
+Button/styles/normal = SubResource("StyleBoxFlat_1fikj")
+Button/styles/normal_mirrored = SubResource("StyleBoxFlat_1fikj")
+Button/styles/pressed = SubResource("StyleBoxFlat_1fikj")
+Button/styles/pressed_mirrored = SubResource("StyleBoxFlat_1fikj")

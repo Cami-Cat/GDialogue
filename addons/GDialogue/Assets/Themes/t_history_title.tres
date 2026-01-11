@@ -1,0 +1,18 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://b687k8a82n32"]
+
+[ext_resource type="FontFile" uid="uid://dcjbn2bgm4thn" path="res://addons/GDialogue/Assets/Fonts/Archivo Black/ArchivoBlack-Regular.ttf" id="1_dehlb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dehlb"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[resource]
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 20
+Label/fonts/font = ExtResource("1_dehlb")
+Label/styles/normal = SubResource("StyleBoxEmpty_dehlb")
+RichTextLabel/colors/default_color = Color(0.1764706, 0.1764706, 0.1764706, 0.6862745)
+RichTextLabel/font_sizes/normal_font_size = 42
+RichTextLabel/fonts/normal_font = ExtResource("1_dehlb")

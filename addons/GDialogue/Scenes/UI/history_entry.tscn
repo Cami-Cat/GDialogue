@@ -1,0 +1,132 @@
+[gd_scene load_steps=6 format=3 uid="uid://b40io1qqh1kgw"]
+
+[ext_resource type="Script" uid="uid://cuys0v4saawoa" path="res://addons/GDialogue/Scripts/UI/history_entry.gd" id="1_1obye"]
+[ext_resource type="Theme" uid="uid://b687k8a82n32" path="res://addons/GDialogue/Assets/Themes/t_history_title.tres" id="1_6v6gy"]
+[ext_resource type="Theme" uid="uid://pprke8bja035" path="res://addons/GDialogue/Assets/Themes/t_history_description.tres" id="2_qv0w8"]
+[ext_resource type="Script" uid="uid://cd3w6stv5ual3" path="res://addons/GDialogue/Scripts/UI/icon_texture.gd" id="3_g14p5"]
+
+[sub_resource type="DPITexture" id="DPITexture_1obye"]
+_source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\"><path fill=\"none\" stroke=\"#fff\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m4 9 3-3-3-3\"/></svg>
+"
+saturation = 0.6
+
+[node name="History Entry" type="Control" node_paths=PackedStringArray("type", "description", "value_before", "value_after")]
+clip_contents = true
+custom_minimum_size = Vector2(400, 90)
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -400.0
+offset_bottom = 80.0
+grow_horizontal = 0
+mouse_filter = 2
+script = ExtResource("1_1obye")
+type = NodePath("Information/Type")
+description = NodePath("Information/Description")
+value_before = NodePath("Information/Value Before")
+value_after = NodePath("Information/Value After")
+
+[node name="Background Colour" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0253638, 0.0253638, 0.025363795, 1)
+
+[node name="Background Colour2" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -68.107506
+offset_top = -0.91999817
+offset_right = 68.107506
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="Information" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Type" type="Label" parent="Information"]
+layout_mode = 1
+offset_right = 168.0
+offset_bottom = 33.0
+theme = ExtResource("1_6v6gy")
+text = "EDITED"
+
+[node name="Description" type="Label" parent="Information"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -209.0
+offset_bottom = 57.0
+grow_horizontal = 0
+theme = ExtResource("2_qv0w8")
+text = "Moved Selection of Nodes"
+horizontal_alignment = 2
+autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Value Before" type="Label" parent="Information"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -35.0
+offset_right = 170.0
+grow_vertical = 0
+theme = ExtResource("2_qv0w8")
+text = "(0, 0)"
+autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Value After" type="Label" parent="Information"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -178.0
+offset_top = -35.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("2_qv0w8")
+text = "(100, 500)"
+horizontal_alignment = 2
+autowrap_mode = 2
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Right Arrow" type="TextureRect" parent="Information"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -23.0
+offset_right = 8.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = SubResource("DPITexture_1obye")
+script = ExtResource("3_g14p5")

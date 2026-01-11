@@ -1,0 +1,166 @@
+@tool
+class_name GridNode
+extends Area2D
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Set the area of the Node
+## ────────────────────────────────────────────────────────────────────────────
+
+## Project-specific minimum and maximum sizes for nodes.
+const MINIMUM_NODE_SIZE 	 : Vector2 = Vector2(200, 100)
+const MAXIMUM_NODE_SIZE 	 : Vector2 = Vector2(2000, 1000)
+
+static var DEFAULT_NODE_SIZE : Vector2 = Vector2(400, 200)
+
+## Set the size of the node in the grid, this is separate to the sizes of other nodes. You can set this within new() as-well-
+## to construct one with a custom size quickly.
+@export var node_size : Vector2 = Vector2(400, 200) :
+	set(a):
+		a.clamp(MINIMUM_NODE_SIZE, MAXIMUM_NODE_SIZE)
+		node_size = a
+		return
+@export var node_module : Script
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Internal Nodes
+## ────────────────────────────────────────────────────────────────────────────
+
+var background : HighlightableRect = null
+var collision  : CollisionShape2D  = null
+var body : Control = null
+var body_module : Node = null
+
+var selected : bool = true
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Peform Setup
+## ────────────────────────────────────────────────────────────────────────────
+
+func _init(_position : Vector2 = Vector2.ZERO, _in_size : Vector2 = DEFAULT_NODE_SIZE, in_node_module : Script = null) -> void:
+	global_position = _position
+	node_size = _in_size
+	node_module = in_node_module
+	return
+
+func _ready() -> void:
+	add_to_group("grid_node")
+	# Await a frame for whether constructed before GDialogue is ready.
+	await get_tree().process_frame
+	
+	# Construct internal nodes.
+	background = _construct_background()
+	collision = _construct_collision_box()
+	_construct_header_text()
+	body = _construct_node_body()
+	body_module = add_node_module(node_module)
+	
+	# Add the area to the custom physics space so that box-select can correctly overlap.
+	_connect_physics_to_custom_space()
+
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Node Construction
+## ────────────────────────────────────────────────────────────────────────────
+
+func _construct_background() -> HighlightableRect:
+	# The background should be a Highlightable Rect, construct a new one.
+	var _background = HighlightableRect.new()
+	
+	# Set background parameters
+	_background.size = node_size
+	
+	add_child(_background)
+	return _background
+
+func _construct_collision_box() -> CollisionShape2D:
+	# Create a box, add it to the self.
+	var _box = CollisionShape2D.new()
+	_box.shape = RectangleShape2D.new()
+	
+	# Set collision parameters.
+	_box.shape.size = node_size
+	_box.position = (node_size / 2)
+	_box.visible = false
+	
+	add_child(_box)
+	return _box
+
+func _construct_header_text() -> NodeHeader:
+	var _label = NodeHeader.new(background.size / 4, Control.PRESET_TOP_WIDE, "New Dialogue")
+	add_child(_label)
+	return _label
+
+func _construct_node_body() -> NodeBody:
+	var _body = NodeBody.new()
+	background.add_child(_body)
+	_body._set_values(Vector2(background.size.x / 2, background.size.y / 3), Control.PRESET_FULL_RECT)
+	return _body
+
+func add_node_module(module_type : Script = NodeModule) -> Node:
+	if module_type == null : return
+	if module_type.get_global_name() != "NodeModule":
+		if !module_type.get_base_script() || module_type.get_base_script().get_global_name() != "NodeModule" : 
+			GDialogue.print_error(GDialogue.ERROR_CODE.INVALID_NODE_MODULE, self.name, module_type.get_global_name())
+			return
+	
+	var _module = module_type.new()
+	body.add_child(_module)
+	
+	# Half extents
+	var half_extent_x = (background.size.x / 2)
+	var half_extent_y = (background.size.y / 2)
+	
+	# Total Margin on the X axis
+	var total_margin_x : float = (background.size.x / 10)
+	
+	_module._set_values(Vector2(half_extent_x - total_margin_x, half_extent_y), Control.PRESET_BOTTOM_WIDE)
+	
+	# Unfortunately, even setting tne anchor hasn't been updating the position correctly with size taken into account. 
+	# Perhaps as a result of call_deferred or set_deferred. But we can handle this manually anyway:
+	# Since the difference between this module's x axis and the background's x axis are [total_margin_x], move it by (total_margin_x / 2).
+	_module.position.x += (total_margin_x / 2)
+	# We'll also Move up by a quarter extent on the Y:
+	# quarter_extent = ((background.size.y / 2) / 2)
+	_module.position.y -= (half_extent_y / 2)
+	_module.module_loaded.connect(_node_finished_loading)
+	return _module
+
+func _node_finished_loading() -> void:
+	return
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Physics Space
+## ────────────────────────────────────────────────────────────────────────────
+
+func _connect_physics_to_custom_space() -> void:
+	GDialogue.grid_area_created.emit(self)
+	# For an area with an already established Collision Shape, you do not need to do any extra stuff. Like in the BoxSelect class.
+	# Here, we can just set that we want it to be monitored and the layers that it will occupy.
+	PhysicsServer2D.area_set_monitorable(get_rid(), true) # (REQUIREMENT : This is false by default.)
+	PhysicsServer2D.area_set_collision_layer(get_rid(), 1) # Areas use Bitmasks, therefore use Bits rather than in-between Integers.
+	PhysicsServer2D.area_set_collision_mask(get_rid(), 1)
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Input Handling
+## ────────────────────────────────────────────────────────────────────────────
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		if event.button_mask == MOUSE_BUTTON_MASK_LEFT:
+			_move(event.relative, GDialogue._grid_zoom_level)
+
+func _move(relative_to : Vector2, current_zoom : float) -> void:
+	position += relative_to / 1.0
+	return
+
+## ────────────────────────────────────────────────────────────────────────────
+## - Visuals
+## ────────────────────────────────────────────────────────────────────────────
+
+func _highlight() -> void:
+	background.highlight()
+	return
+
+func _unhighlight() -> void:
+	background.unhighlight()
+	return

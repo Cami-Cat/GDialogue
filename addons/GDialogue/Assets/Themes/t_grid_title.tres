@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dgt8hultgael6"]
+
+[ext_resource type="FontFile" uid="uid://dcjbn2bgm4thn" path="res://addons/GDialogue/Assets/Fonts/Archivo Black/ArchivoBlack-Regular.ttf" id="1_xjbko"]
+
+[resource]
+Label/colors/font_color = Color(0.17714646, 0.17714646, 0.17714646, 0.6862745)
+Label/font_sizes/font_size = 42
+Label/fonts/font = ExtResource("1_xjbko")
+RichTextLabel/colors/default_color = Color(0.1764706, 0.1764706, 0.1764706, 0.6862745)
+RichTextLabel/font_sizes/normal_font_size = 42
+RichTextLabel/fonts/normal_font = ExtResource("1_xjbko")
