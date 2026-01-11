@@ -18,7 +18,7 @@ shader_parameter/cell_size = 32.0
 shader_parameter/dot_size_px = 2.0
 shader_parameter/background_color = Color(0.047058824, 0.05490196, 0.09411765, 1)
 shader_parameter/dot_color = Color(0.25565878, 0.25565878, 0.25565878, 1)
-shader_parameter/world_offset = Vector2(-1623, -355)
+shader_parameter/world_offset = Vector2(-1598, -357)
 
 [sub_resource type="DPITexture" id="DPITexture_td1yx"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M8 9H1V2l2 2a3.875 5 30 0 1 9 11 3.5 5 10 0 0-6-8z\"/></svg>
@@ -414,10 +414,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 172.0
-offset_top = -837.0
-offset_right = 7084.0
-offset_bottom = 2715.0
+offset_left = 723.0
+offset_top = -243.0
+offset_right = 7635.0
+offset_bottom = 3309.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2

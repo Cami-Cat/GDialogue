@@ -35,8 +35,6 @@ func _ready() -> void:
 
 func _connect_signals() -> void:
 	GDialogue.grid_tool_changed.connect(tool_changed)
-	mouse_entered.connect(_on_mouse_enter)
-	mouse_exited.connect(_on_mouse_exit)
 	return
 
 func _initialize_tool() -> void:
@@ -87,27 +85,4 @@ func _unhighlight() -> void:
 	await tween_border_highlight(0.0, 0.1)
 	stylebox.set_border_width_all(0)
 	stylebox.set_expand_margin_all(0)
-	return
-
-## ────────────────────────────────────────────────────────────────────────────
-## - Input Handling.
-## ────────────────────────────────────────────────────────────────────────────
-
-func _on_mouse_enter() -> void:
-	## If the current tool is a box select, we don't want to highlight or unhighlight or that will create odd looking interactions,
-	## So we'll just return here. It can handle the highlighting itself.
-	if current_tool == GridEditor.TOOL_MODE.BOX_SELECT || current_tool == GridEditor.TOOL_MODE.PAN: return
-	can_select = true
-	if !is_selected:
-		_highlight()
-	return
-
-func _on_mouse_exit() -> void:
-	## If the current tool is a box select, we don't want to highlight or unhighlight or that will create odd looking interactions,
-	## So we'll just return here. It can handle the highlighting itself.
-	## Further, when Pan is selected, we don't want to be able to select the object, so we also just return.
-	if current_tool == GridEditor.TOOL_MODE.BOX_SELECT || current_tool == GridEditor.TOOL_MODE.PAN : return
-	can_select = false
-	if !is_selected:
-		_unhighlight()
 	return

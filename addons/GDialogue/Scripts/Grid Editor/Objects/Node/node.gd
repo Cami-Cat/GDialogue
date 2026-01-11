@@ -30,7 +30,12 @@ var collision  : CollisionShape2D  = null
 var body : Control = null
 var body_module : Node = null
 
-var selected : bool = true
+var node_selected : bool = true
+var mouse_over : bool = false
+
+var input_position : Vector2 = Vector2.ZERO
+var just_selected : bool = false
+var is_dragging : bool = false
 
 ## ────────────────────────────────────────────────────────────────────────────
 ## - Peform Setup
@@ -145,22 +150,90 @@ func _connect_physics_to_custom_space() -> void:
 ## ────────────────────────────────────────────────────────────────────────────
 
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		# Ignore the input outside of itself.
+		if !background.get_rect().has_point(get_global_mouse_position() - global_position) : return
+		# So long as the button matches the required button and so long as it isn't an echo:
+		if event.button_index == MOUSE_BUTTON_LEFT && !event.is_echo():
+			# Select the node, if it's not selected. Otherwise, update the input position.
+			if event.is_pressed():
+				if !node_selected:
+					_select_node(event.position)
+					return
+				else:
+					_update_input_position(event.position)
+					return
+			# If the Input Position isn't far enough from the new position of the mouse and you release on click, deselect the node.
+			if event.is_released():
+				is_dragging = false
+				# Check for whether the node was just selected (on_release will be called on first click), then return early.
+				if _is_just_selected() : return
+				# Check for movement.
+				if !has_moved(event.position):
+					_deselect()
+					return
+					
 	if event is InputEventMouseMotion:
+		# If you're already currently dragging, you can completely ignore these checks.
+		if !is_dragging:
+			# Otherwise, we check for whether the node is selected and if the node *can* be moved.
+			if !node_selected || !background.get_rect().has_point(get_global_mouse_position() - global_position) : return
 		if event.button_mask == MOUSE_BUTTON_MASK_LEFT:
+			# We update dragging here so we can avoid all those checks above and allow it to keep moving even when the mouse is outside of it's rect.
+			# And then move it to the relative position of the event. Multiplied by the zoom level of the grid.
+			is_dragging = true
 			_move(event.relative, GDialogue._grid_zoom_level)
 
-func _move(relative_to : Vector2, current_zoom : float) -> void:
-	position += relative_to / 1.0
+func _select_node(in_position : Vector2) -> void:
+	# We update just_selected so that when we check for release, we don't automatically deselect it.
+	just_selected = true
+	# We also then set node_selected so that the node is indeed selected.
+	node_selected = true
+	background._highlight()
+	# We then update the position of the input to where the input event happened.
+	_update_input_position(in_position)
+
+func _is_just_selected() -> bool :
+	# If it's just selected, return that it was indeed just selected, but then force update it to false so the next check immediately returns false.
+	if just_selected:
+		just_selected = false
+		return true
+	return false
+
+func _deselect() -> void:
+	background._unhighlight()
+	node_selected = false
 	return
+
+func _update_input_position(in_position : Vector2) -> void:
+	# We set this for comparison against whether the mouse has moved from the initial position of the event. As seen in the function:
+	# has_moved() -> bool:
+	input_position = in_position
+	
+func _move(relative_to : Vector2, current_zoom : float) -> void:
+	# Update the position of the node relative to the zoom on the grid.
+	position += relative_to / current_zoom
+	return
+
+func has_moved(in_position : Vector2) -> bool:
+	# Create and round a total to prevent floating point errors
+	var input_position_total = int(input_position.x + input_position.y)
+	var in_position_total = int(in_position.x + in_position.y)
+	
+	# Require the ABSOLUTE (turn a negative value into a positive) difference between positions to be greater than 1 # units
+	if abs(input_position_total - in_position_total) > 1 : return true
+	return false
 
 ## ────────────────────────────────────────────────────────────────────────────
 ## - Visuals
 ## ────────────────────────────────────────────────────────────────────────────
 
 func _highlight() -> void:
+	if node_selected : return
 	background.highlight()
 	return
 
 func _unhighlight() -> void:
+	if node_selected : return
 	background.unhighlight()
 	return
