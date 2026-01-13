@@ -236,8 +236,8 @@ func has_moved(in_position : Vector2) -> bool:
 	var input_position_total = abs(input_position.x) + abs(input_position.y)
 	var in_position_total = abs(in_position.x) + abs(in_position.y)
 	# Require the ABSOLUTE (turn a negative value into a positive) difference between positions to be greater than MOVEMENT_THRESHOLD # units
-	var position_difference = in_position_total - input_position_total
-	if position_difference > MOVEMENT_THRESHOLD || position_difference < MOVEMENT_THRESHOLD : return true
+	var position_difference = abs(in_position_total - input_position_total)
+	if position_difference > MOVEMENT_THRESHOLD : return true
 	return false
 
 ## ────────────────────────────────────────────────────────────────────────────
