@@ -27,6 +27,5 @@ y_sort_enabled = true
 custom_minimum_size = Vector2(400, 200)
 offset_right = 400.0
 offset_bottom = 200.0
-mouse_filter = 1
 theme = SubResource("Theme_cedvt")
 script = ExtResource("1_hy0yl")

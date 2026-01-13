@@ -28,7 +28,7 @@ var can_hide : bool = true
 func _ready() -> void:
 	z_index = 4096
 	y_sort_enabled = true
-
+	_connect_signals()
 	# Perform initial history setup
 	_get_data()
 	return

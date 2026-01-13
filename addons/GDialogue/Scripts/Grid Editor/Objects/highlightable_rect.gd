@@ -6,6 +6,24 @@ signal selected
 signal unselected
 
 ## ────────────────────────────────────────────────────────────────────────────
+## - Constants
+## ────────────────────────────────────────────────────────────────────────────
+
+const MINIMUM_OUTLINE_SIZE : int = 1 # px, minimum required number to render.
+const MAXIMUM_OUTLINE_SIZE : int = 5 # px, incase end-user increases scale range, prevent this from getting astronomically large.
+const ZOOM_SCALING_COEFFICIENT : float = 1.5 # Alter this to taste, makes the line thickness much more consistent and without odd widths.
+
+const HIGHLIGHTED_OUTLINE_SIZE_DEFAULT : int = 1
+const MOUSE_OVER_OUTLINE_SIZE_DEFAULT : int = 1
+const UNHIGHLIGHTED_OUTLINE_SIZE_DEFAULT : int = 0
+
+static var HIGHLIGHTED_OUTLINE_ALPHA_DEFAULT : int = (255 / 2) # Half opacity, ([255] is [100%] in RGBA)
+static var MOUSE_OVER_OUTLINE_ALPHA_DEFAULT : int = (255 / 4) # Quarter opacity.
+static var UNHIGHLIGHTED_OUTLINE_ALPHA_DEFAULT : int = 0
+
+const HIGHLIGHT_ANIMATION_LENGTH : float = 0.1 # Add a little animation for just a touch of polish.
+
+## ────────────────────────────────────────────────────────────────────────────
 ## - External Variables
 ## ────────────────────────────────────────────────────────────────────────────
 
@@ -46,7 +64,7 @@ func _initialize_stylebox() -> void:
 	theme = preload("res://addons/GDialogue/Assets/Themes/t_highlight_rect.tres").duplicate(true)
 	y_sort_enabled = true
 	stylebox = get_theme_stylebox("panel", "")
-	stylebox.set_border_width_all(1)
+	_unhighlight()
 	return
 
 ## ────────────────────────────────────────────────────────────────────────────
@@ -75,14 +93,28 @@ func tween_border_highlight(to_alpha : float = 0.0, length : float = 0.0) -> voi
 	return
 
 func _highlight() -> void:
-	stylebox.set_expand_margin_all(1)
-	stylebox.set_border_width_all(1)
-	var alpha = int(255 / 2)
-	await tween_border_highlight(alpha, 0.1)
+	is_selected = true
+	_update_properties(HIGHLIGHTED_OUTLINE_SIZE_DEFAULT)
+	var alpha = HIGHLIGHTED_OUTLINE_ALPHA_DEFAULT
+	await tween_border_highlight(alpha, HIGHLIGHT_ANIMATION_LENGTH)
 	return
 
 func _unhighlight() -> void:
-	await tween_border_highlight(0.0, 0.1)
-	stylebox.set_border_width_all(0)
-	stylebox.set_expand_margin_all(0)
+	is_selected = false
+	var alpha = UNHIGHLIGHTED_OUTLINE_ALPHA_DEFAULT
+	await tween_border_highlight(alpha, HIGHLIGHT_ANIMATION_LENGTH)
+	_update_properties(UNHIGHLIGHTED_OUTLINE_SIZE_DEFAULT)
 	return
+
+func _update_properties(new_data : Variant) -> void:
+	stylebox.set_border_width_all(new_data)
+	stylebox.set_expand_margin_all(new_data)
+	return
+
+func _process(delta: float) -> void:
+	if is_selected:
+		stylebox.set_expand_margin_all(_get_zoomed_size()) 
+		stylebox.set_border_width_all(_get_zoomed_size()) 
+
+func _get_zoomed_size() -> int:
+	return clampi((HIGHLIGHTED_OUTLINE_SIZE_DEFAULT / (GDialogue._grid_zoom_level / ZOOM_SCALING_COEFFICIENT)), MINIMUM_OUTLINE_SIZE, MAXIMUM_OUTLINE_SIZE)

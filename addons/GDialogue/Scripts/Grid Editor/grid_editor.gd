@@ -48,16 +48,13 @@ var node_parent : Control
 func _ready() -> void:
 	# Await to allow Godot to process and create the Global class before intiializing self.
 	await get_tree().process_frame
-	GDialogue.get_history_list.connect(_get_history)
-	GDialogue.add_action_to_history.connect(_add_action_to_history)
-	GDialogue.grid_tool_changed.connect(_tool_changed)
-	GDialogue.set_node_parent.connect(_set_node_parent)
 	
 	# Force a grid setup.
 	_setup_grid()
 
 func _setup_grid() -> void:
 	# Connect the setup for future plugin reloads.
+	GDialogue.set_node_parent.connect(_set_node_parent)
 	GDialogue.plugin_loaded.connect(_setup_grid)
 	# Reset the currently selected tool
 	GDialogue.grid_tool_changed.emit(TOOL_MODE.NONE)
@@ -65,6 +62,10 @@ func _setup_grid() -> void:
 	
 	# Set that self is ready.
 	GDialogue.grid_ready.emit(self)
+
+	GDialogue.get_history_list.connect(_get_history)
+	GDialogue.add_action_to_history.connect(_add_action_to_history)
+	GDialogue.grid_tool_changed.connect(_tool_changed)
 	
 
 ## ────────────────────────────────────────────────────────────────────────────
@@ -127,15 +128,15 @@ class Action extends Resource:
 
 	var _type : HISTORY_TYPE
 	var _description : String
-	var _when : Dictionary
+	var _when : String
 	
 	var _data_before : Variant
 	var _data_after	 : Variant
 	
-	func _init(in_type : HISTORY_TYPE, in_description : String, in_when : Dictionary, in_data_before : Variant, in_data_after : Variant) -> void:
+	func _init(in_type : HISTORY_TYPE, in_description : String, in_data_before : Variant, in_data_after : Variant) -> void:
 		_type = in_type
 		_description = in_description
-		_when = in_when
+		_when = Time.get_time_string_from_system()
 		_data_before = in_data_before
 		_data_after = in_data_after
 		return
@@ -150,7 +151,7 @@ class Action extends Resource:
 	func get_data_after() -> Variant:
 		return _data_after
 
-	func get_when() -> Dictionary:
+	func get_when() -> String:
 		return _when
 	
 	func get_description() -> String:
@@ -178,6 +179,7 @@ func _get_history() -> void:
 	GDialogue.got_history_list.emit(history)
 
 func _add_action_to_history(action : Action) -> bool:
+	GDialogue.print_log(str(action.get_action_as_dict()), GDialogue.LOG_TYPES.SUCCESS)
 	history.create_new_action(action)
 	if history._actions.has(action):
 		return true

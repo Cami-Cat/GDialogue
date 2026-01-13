@@ -71,9 +71,9 @@ func _input(event : InputEvent) -> void:
 					_create_box_select()
 				if event.is_released():
 					_end_box_select()
-	elif event is InputEventKey:
-		if event.keycode == KEY_N:
-			GDialogue._grid.node_parent._construct_node(NodeModuleTextEdit, get_global_mouse_position())
+	#elif event is InputEventKey:
+		#if event.keycode == KEY_N:
+			#GDialogue._grid.node_parent._construct_node(NodeModuleTextEdit, get_global_mouse_position())
 	return
 
 ## ────────────────────────────────────────────────────────────────────────────

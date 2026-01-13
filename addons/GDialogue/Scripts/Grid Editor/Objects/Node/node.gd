@@ -9,6 +9,8 @@ extends Area2D
 ## Project-specific minimum and maximum sizes for nodes.
 const MINIMUM_NODE_SIZE 	 : Vector2 = Vector2(200, 100)
 const MAXIMUM_NODE_SIZE 	 : Vector2 = Vector2(2000, 1000)
+## The threshold that informs the node when it has successfully moved enough not to be deselected on button release.
+const MOVEMENT_THRESHOLD	 : float = 1.0
 
 static var DEFAULT_NODE_SIZE : Vector2 = Vector2(400, 200)
 
@@ -142,7 +144,7 @@ func _connect_physics_to_custom_space() -> void:
 	# For an area with an already established Collision Shape, you do not need to do any extra stuff. Like in the BoxSelect class.
 	# Here, we can just set that we want it to be monitored and the layers that it will occupy.
 	PhysicsServer2D.area_set_monitorable(get_rid(), true) # (REQUIREMENT : This is false by default.)
-	PhysicsServer2D.area_set_collision_layer(get_rid(), 1) # Areas use Bitmasks, therefore use Bits rather than in-between Integers.
+	PhysicsServer2D.area_set_collision_layer(get_rid(), 1) # Areas use Bitmasks, therefore use Bits (1, 2, 4, 8, 16...) rather than Integers.
 	PhysicsServer2D.area_set_collision_mask(get_rid(), 1)
 
 ## ────────────────────────────────────────────────────────────────────────────
@@ -152,7 +154,7 @@ func _connect_physics_to_custom_space() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		# Ignore the input outside of itself.
-		if !background.get_rect().has_point(get_global_mouse_position() - global_position) : return
+		if !background.get_rect().has_point((get_global_mouse_position() - global_position) / GDialogue._grid_zoom_level) : return
 		# So long as the button matches the required button and so long as it isn't an echo:
 		if event.button_index == MOUSE_BUTTON_LEFT && !event.is_echo():
 			# Select the node, if it's not selected. Otherwise, update the input position.
@@ -170,25 +172,35 @@ func _input(event: InputEvent) -> void:
 			if event.is_released():
 				is_dragging = false
 				# Check for whether the node was just selected (on_release will be called on first click), then return early.
-				if _is_just_selected() : return
 				# Check for movement.
-				if !has_moved(event.position):
-					if event.button_mask == KEY_MASK_CTRL:
-						_input_deselect_node(false)
-					else:
-						_input_deselect_node(true)
-					return
+				if !_is_just_selected() : 
+					if has_moved(event.position):
+						var action : GridEditor.Action = GridEditor.Action.new(
+							GridEditor.Action.HISTORY_TYPE.TRANSFORM,
+							"Moved selected Node.",
+							input_position,
+							global_position
+						)
+						GDialogue.add_action_to_history.emit(action)
+					
+					
+					if !has_moved(event.position):
+						if event.button_mask == KEY_MASK_CTRL:
+							_input_deselect_node(false)
+						else:
+							_input_deselect_node(true)
+						return
 					
 	if event is InputEventMouseMotion:
 		# If you're already currently dragging, you can completely ignore these checks.
 		if !is_dragging:
 			# Otherwise, we check for whether the node is selected and if the node *can* be moved.
-			if !node_selected || !background.get_rect().has_point(get_global_mouse_position() - global_position) : return
+			if !node_selected || !background.get_rect().has_point((get_global_mouse_position() - global_position) / GDialogue._grid_zoom_level) : return
 		if event.button_mask == MOUSE_BUTTON_MASK_LEFT:
 			# We update dragging here so we can avoid all those checks above and allow it to keep moving even when the mouse is outside of it's rect.
 			# And then move it to the relative position of the event. Multiplied by the zoom level of the grid.
 			is_dragging = true
-			GDialogue.move_selected_nodes.emit((event.relative / GDialogue._grid_zoom_level))
+			GDialogue.move_selected_nodes.emit(event.relative / GDialogue._grid_zoom_level)
 
 func _input_select_node(in_position : Vector2 = Vector2.ZERO, overwrite_selected_nodes : bool = true) -> void:
 	# We update just_selected so that when we check for release, we don't automatically deselect it.
@@ -215,7 +227,8 @@ func _update_input_position(in_position : Vector2) -> void:
 	input_position = in_position
 	
 func _move(relative_position : Vector2) -> void:
-	# Update the position of the node relative to the zoom on the grid.
+	# This is called by GDialogue to correctly move multiple nodes relative to their position.
+	# This is calculated with (event.relative / _grid_zoom_level) which returns the relative position of the event to the node.
 	position += relative_position
 	return
 
@@ -223,9 +236,9 @@ func has_moved(in_position : Vector2) -> bool:
 	# Create and round a total to prevent floating point errors
 	var input_position_total = int(input_position.x + input_position.y)
 	var in_position_total = int(in_position.x + in_position.y)
-	
-	# Require the ABSOLUTE (turn a negative value into a positive) difference between positions to be greater than 1 # units
-	if abs(input_position_total - in_position_total) > 1 : return true
+	# Require the ABSOLUTE (turn a negative value into a positive) difference between positions to be greater than MOVEMENT_THRESHOLD # units
+	var position_difference = abs(input_position_total - in_position_total)
+	if position_difference > MOVEMENT_THRESHOLD : return true
 	return false
 
 ## ────────────────────────────────────────────────────────────────────────────

@@ -14,6 +14,8 @@ const additional_error_info : bool = true
 static var _physics_server : RID
 static var _grid_zoom_level : float
 static var _grid : GridEditor
+# Should the grid editor recieve inputs, this is automatically updated upon the visibility of the grid being changed. Otherwise, nothing will process inputs.
+static var should_recieve_inputs : bool = false
 
 ## ────────────────────────────────────────────────────────────────────────────
 ## - Palette
@@ -54,16 +56,16 @@ func get_valid_colours() -> Array:
 ## - Error Codes
 ## ────────────────────────────────────────────────────────────────────────────
 
-enum LOG_COLOURS {
+enum LOG_TYPES {
 	ERROR, WARN, LOG, INFO, SUCCESS
 }
 
-const Log_Colours : Dictionary[LOG_COLOURS, Color] = {
-	LOG_COLOURS.ERROR : Color(1.0, 0.177, 0.254, 1.0),
-	LOG_COLOURS.WARN : Color(1.0, 0.523, 0.156, 1.0),
-	LOG_COLOURS.LOG : Color(0.634, 0.634, 0.634, 1.0),
-	LOG_COLOURS.INFO : Color(0.344, 0.344, 0.344, 1.0),
-	LOG_COLOURS.SUCCESS : Color(0.0, 0.646, 0.169, 1.0),
+const Log_Colours : Dictionary[LOG_TYPES, Color] = {
+	LOG_TYPES.ERROR : Color(1.0, 0.177, 0.254, 1.0),
+	LOG_TYPES.WARN : Color(1.0, 0.523, 0.156, 1.0),
+	LOG_TYPES.LOG : Color(0.42, 0.42, 0.42, 1.0),
+	LOG_TYPES.INFO : Color(0.335, 0.521, 0.52, 1.0),
+	LOG_TYPES.SUCCESS : Color(0.0, 0.646, 0.169, 1.0),
 }
 
 enum ERROR_CODE {
@@ -75,7 +77,7 @@ const Error_Dict : Dictionary[ERROR_CODE, String] = {
 	ERROR_CODE.INVALID_NODE_CONTAINER : "Node Container is invalid (Plugin Error).",
 	ERROR_CODE.INVALID_NODE : "Node is invalid.",
 	ERROR_CODE.INVALID_PALETTE_COLOUR : "Colour [%s] does not exist within the GDialogue palette.",
-	ERROR_CODE.INVALID_NODE_MODULE : "Error constructing Node Module for node [%s]: Script [%s] is not a valid extension of NodeModule"
+	ERROR_CODE.INVALID_NODE_MODULE : "Error constructing Node Module for node [%s]: Script [%s] is not a valid NodeModule"
 }
 
 ## Print an error from [enum ERROR_CODE] with [member args] being any additional strings related to the error.
@@ -101,8 +103,14 @@ func print_error(error_code : ERROR_CODE, ...args) -> void:
 	
 	match error_code:
 		ERROR_CODE.INVALID_PALETTE_COLOUR : error_string += "\n[color=%s] ╰> Find valid colours by using GDialogue.get_valid_colours()[/color]"
-		ERROR_CODE.INVALID_NODE_MODULE : error_string += "\n[color=%s] ╰> Script reference must extend NodeModule[/color]"
-	print_rich(error_string % [Log_Colours[LOG_COLOURS.INFO].to_html()])
+		ERROR_CODE.INVALID_NODE_MODULE : error_string += "\n[color=%s] ╰> Script must extend NodeModule[/color]"
+	print_rich(error_string % [Log_Colours[LOG_TYPES.INFO].to_html()])
+	return
+
+func print_log(log_text : String, log_type : LOG_TYPES = LOG_TYPES.LOG) -> void:
+	var _time_string : String = Time.get_time_string_from_system()
+	var _log_text = "[color=%s]◈ [%s] %s : %s[/color]" % [Log_Colours[log_type].to_html(), _time_string, LOG_TYPES.keys()[log_type], log_text]
+	print_rich(_log_text)
 	return
 
 ## ────────────────────────────────────────────────────────────────────────────
@@ -216,10 +224,11 @@ func _add_area_to_space(area_rid : RID) -> void:
 	return
 
 ## ────────────────────────────────────────────────────────────────────────────
-## - Node Selection
+## - Global Node Handling
 ## ────────────────────────────────────────────────────────────────────────────
 
 func select_node(in_node : Node, overwrite_selected_nodes : bool) -> void:
+	if selected_nodes.has(in_node) : return
 	if overwrite_selected_nodes:
 		deselect_all_selected_nodes()
 	selected_nodes.append(in_node)

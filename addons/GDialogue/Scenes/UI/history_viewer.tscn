@@ -19,19 +19,6 @@ grow_horizontal = 0
 mouse_filter = 2
 script = ExtResource("1_uxh27")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
-custom_minimum_size = Vector2(400, 300)
-layout_mode = 0
-offset_right = 408.0
-offset_bottom = 300.0
-mouse_filter = 0
-
-[node name="Action Container" type="VBoxContainer" parent="ScrollContainer"]
-custom_minimum_size = Vector2(400, 50)
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 0
-
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -42,6 +29,7 @@ grow_vertical = 2
 theme = ExtResource("2_t2lom")
 
 [node name="Empty Label" type="Label" parent="Panel"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -56,3 +44,16 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_b6ae6")
 text = "It's empty in here..."
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 0
+offset_right = 408.0
+offset_bottom = 300.0
+mouse_filter = 0
+
+[node name="Action Container" type="VBoxContainer" parent="ScrollContainer"]
+custom_minimum_size = Vector2(400, 50)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
