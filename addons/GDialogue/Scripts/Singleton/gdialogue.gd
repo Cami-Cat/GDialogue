@@ -107,9 +107,14 @@ func print_error(error_code : ERROR_CODE, ...args) -> void:
 	print_rich(error_string % [Log_Colours[LOG_TYPES.INFO].to_html()])
 	return
 
-func print_log(log_text : String, log_type : LOG_TYPES = LOG_TYPES.LOG) -> void:
+func print_log(log_type : LOG_TYPES = LOG_TYPES.LOG, log_text : String = "", ...args) -> void:
 	var _time_string : String = Time.get_time_string_from_system()
 	var _log_text = "[color=%s]◈ [%s] %s : %s[/color]" % [Log_Colours[log_type].to_html(), _time_string, LOG_TYPES.keys()[log_type], log_text]
+	
+	if args.size() > 0:
+		for arg in args:
+			_log_text += "\n[color=%s]╰> %s" % [Log_Colours[LOG_TYPES.LOG].to_html(), arg]
+			
 	print_rich(_log_text)
 	return
 

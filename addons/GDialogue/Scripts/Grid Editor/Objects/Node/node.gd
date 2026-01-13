@@ -169,7 +169,7 @@ func _input(event: InputEvent) -> void:
 					_update_input_position(event.position)
 					return
 			# If the Input Position isn't far enough from the new position of the mouse and you release on click, deselect the node.
-			if event.is_released():
+			if event.is_released() && ! event.is_echo():
 				is_dragging = false
 				# Check for whether the node was just selected (on_release will be called on first click), then return early.
 				# Check for movement.
@@ -182,7 +182,6 @@ func _input(event: InputEvent) -> void:
 							global_position
 						)
 						GDialogue.add_action_to_history.emit(action)
-					
 					
 					if !has_moved(event.position):
 						if event.button_mask == KEY_MASK_CTRL:
@@ -234,11 +233,11 @@ func _move(relative_position : Vector2) -> void:
 
 func has_moved(in_position : Vector2) -> bool:
 	# Create and round a total to prevent floating point errors
-	var input_position_total = int(input_position.x + input_position.y)
-	var in_position_total = int(in_position.x + in_position.y)
+	var input_position_total = abs(input_position.x) + abs(input_position.y)
+	var in_position_total = abs(in_position.x) + abs(in_position.y)
 	# Require the ABSOLUTE (turn a negative value into a positive) difference between positions to be greater than MOVEMENT_THRESHOLD # units
-	var position_difference = abs(input_position_total - in_position_total)
-	if position_difference > MOVEMENT_THRESHOLD : return true
+	var position_difference = in_position_total - input_position_total
+	if position_difference > MOVEMENT_THRESHOLD || position_difference < MOVEMENT_THRESHOLD : return true
 	return false
 
 ## ────────────────────────────────────────────────────────────────────────────

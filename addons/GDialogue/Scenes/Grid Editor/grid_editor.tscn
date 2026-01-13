@@ -14,11 +14,11 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_acnr7"]
 resource_local_to_scene = true
 shader = ExtResource("2_acnr7")
-shader_parameter/cell_size = 24.320000000000004
+shader_parameter/cell_size = 21.760000000000005
 shader_parameter/dot_size_px = 2.0
 shader_parameter/background_color = Color(0.047058824, 0.05490196, 0.09411765, 1)
 shader_parameter/dot_color = Color(0.25565878, 0.25565878, 0.25565878, 1)
-shader_parameter/world_offset = Vector2(-1164, -322)
+shader_parameter/world_offset = Vector2(-800, -178)
 
 [sub_resource type="DPITexture" id="DPITexture_td1yx"]
 _source = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\"><path fill=\"#e0e0e0\" d=\"M8 9H1V2l2 2a3.875 5 30 0 1 9 11 3.5 5 10 0 0-6-8z\"/></svg>
@@ -414,12 +414,12 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 31.0
-offset_top = -783.0
-offset_right = 6943.0
-offset_bottom = 2769.0
+offset_left = -275.0
+offset_top = -929.0
+offset_right = 6637.0
+offset_bottom = 2623.0
 grow_horizontal = 2
 grow_vertical = 0
-scale = Vector2(0.76, 0.76)
+scale = Vector2(0.68, 0.68)
 mouse_filter = 2
 script = ExtResource("10_td1yx")

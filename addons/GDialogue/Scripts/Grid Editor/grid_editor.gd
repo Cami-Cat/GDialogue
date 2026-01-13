@@ -49,23 +49,23 @@ func _ready() -> void:
 	# Await to allow Godot to process and create the Global class before intiializing self.
 	await get_tree().process_frame
 	
+	GDialogue.set_node_parent.connect(_set_node_parent)
+	GDialogue.grid_tool_changed.connect(_tool_changed)
+	GDialogue.grid_tool_changed.emit(TOOL_MODE.NONE)
+	GDialogue.get_history_list.connect(_get_history)
+	GDialogue.add_action_to_history.connect(_add_action_to_history)
 	# Force a grid setup.
 	_setup_grid()
 
 func _setup_grid() -> void:
 	# Connect the setup for future plugin reloads.
-	GDialogue.set_node_parent.connect(_set_node_parent)
 	GDialogue.plugin_loaded.connect(_setup_grid)
 	# Reset the currently selected tool
-	GDialogue.grid_tool_changed.emit(TOOL_MODE.NONE)
 	GDialogue.get_tool.emit()
 	
 	# Set that self is ready.
 	GDialogue.grid_ready.emit(self)
 
-	GDialogue.get_history_list.connect(_get_history)
-	GDialogue.add_action_to_history.connect(_add_action_to_history)
-	GDialogue.grid_tool_changed.connect(_tool_changed)
 	
 
 ## ────────────────────────────────────────────────────────────────────────────
@@ -179,8 +179,8 @@ func _get_history() -> void:
 	GDialogue.got_history_list.emit(history)
 
 func _add_action_to_history(action : Action) -> bool:
-	GDialogue.print_log(str(action.get_action_as_dict()), GDialogue.LOG_TYPES.SUCCESS)
 	history.create_new_action(action)
+	# It now has the action.
 	if history._actions.has(action):
 		return true
 	return false
@@ -190,6 +190,7 @@ class History:
 	var _actions : Array[Action]
 
 	func create_new_action(in_action : Action) -> Action:
+		GDialogue.print_log(GDialogue.LOG_TYPES.INFO, "New Action created in history:", in_action.get_when(), in_action.get_description(), str(in_action.get_data_before()) + " ⇀ " + str(in_action.get_data_after()))
 		_actions.append(in_action)
 		return in_action
 
